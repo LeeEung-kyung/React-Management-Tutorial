@@ -22,9 +22,34 @@ const connection = mysql.createConnection({
 }); //객체 초기화
 connection.connect(); //수행
 
+//서버 파일처리 upload폴더에 저장
+const multer = require('multer');
+const upload = multer({dest: './upload'});
+
+//get
 app.get('/api/customers', (req,res) => {
     connection.query(
         "SELECT * FROM CUSTOMER",
+        (err, rows, fields) => {
+            res.send(rows);
+        }
+    );
+});
+
+//upload파일을 공유 사용자는 image경로로 사용
+app.use('/image', express.static('./upload'));
+
+//post
+app.post('/api/customers', upload.single('image'), (req, res) =>{
+    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ? ,?)';
+    //multer가 자동으로 파일이름랜덤으로 생성 저장
+    let image = '/image/' + req.file.filename;
+    let name = req.body.name;
+    let birthday = req.body.birthday;
+    let gender = req.body.gender;
+    let job = req.body.job;
+    let params = [image, name, birthday, gender, job];
+    connection.query(sql, params,
         (err, rows, fields) => {
             res.send(rows);
         }
