@@ -68,6 +68,7 @@ class App extends Component {
   }
 
   render() {
+    //클래스 변수 초기화
     const { classes } = this.props;
     return (
       <div>
